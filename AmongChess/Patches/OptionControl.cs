@@ -356,7 +356,6 @@ namespace AmongChess.Patches
 						PlayerControl playerControl = PlayerControl.AllPlayerControls[i];
 						playerControl.RpcSetColor((byte)colorsList[random]);
 						colorsList.RemoveAt(random);
-						GameEvents.AllPlayers.Add(playerControl);
 					}
 				}
 			}

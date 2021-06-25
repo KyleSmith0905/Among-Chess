@@ -27,14 +27,9 @@ namespace AmongChess.Patches
 		{
 			[HarmonyPatch(nameof(ShipStatus.RpcEndGame))]
 			[HarmonyPrefix]
-			public static bool RpcEndGamePatch(ref GameOverReason endReason)
+			public static bool RpcEndGamePatch(GameOverReason endReason)
 			{
-				if (endReason == GameOverReason.HumansByVote) return false;
-				MessageWriter rpcMessage = AmongUsClient.Instance.StartEndGame();
-				rpcMessage.Write((byte)GameOverReason.HumansByVote);
-				rpcMessage.Write(false);
-				AmongUsClient.Instance.FinishEndGame(rpcMessage);
-				return false;
+				return endReason != GameOverReason.HumansByVote;
 			}
 
 			[HarmonyPatch(nameof(ShipStatus.Start))]
@@ -140,24 +135,22 @@ namespace AmongChess.Patches
 				LocalHat = PlayerControl.LocalPlayer.Data.HatId;
 				LocalSkin = PlayerControl.LocalPlayer.Data.SkinId;
 				LocalPet = PlayerControl.LocalPlayer.Data.PetId;
+				PlayerTurn = 0;
+				TotalTurns = 0;
 				int playerCount = GameData.Instance.PlayerCount;
 				string[] colorNames = (string[])ColorNames.GetValue(playerCount - 1);
 				int[] colorIds = (int[])ColorIds.GetValue(playerCount - 1);
 				if (AllPlayers.Count == 0)
 				{
-					for (int j = 0; j < PlayerControl.AllPlayerControls.Count; j++)
+					for (int i = 0; i < colorIds.Length; i++)
 					{
-						if (PlayerControl.AllPlayerControls[j].Data == null) continue;
-						for (int i = 0; i < colorIds.Length; i++)
+						for (int j = 0; j < PlayerControl.AllPlayerControls.Count; j++)
 						{
 							PlayerControl playerControl = PlayerControl.AllPlayerControls[j];
-							if (colorIds[i] == PlayerControl.AllPlayerControls[j].Data.ColorId) AllPlayers.Add(PlayerControl.AllPlayerControls[j]);
+							if (playerControl.Data == null) continue;
+							if (colorIds[i] == playerControl.Data.ColorId) AllPlayers.Add(playerControl);
 						}
 					}
-				}
-				for (int i = 0; i < AllPlayers.Count; i++)
-				{
-					AllPlayers[i].SetColor(colorIds[i]);
 				}
 				int color = PlayerControl.LocalPlayer.Data.ColorId;
 				int index = -1;
@@ -192,8 +185,6 @@ namespace AmongChess.Patches
 				{
 					Timers.Add(timeAdded);
 				}
-				PlayerTurn = 0;
-				TotalTurns = 0;
 			}
 		}
 
@@ -276,7 +267,7 @@ namespace AmongChess.Patches
 					string format = time.TotalHours >= 1 ? time.ToString(@"hh\:mm") : (time.TotalMinutes >= 1 ? time.ToString(@"mm\:ss") : time.ToString(@"ss\:ff"));
 					results += GameOptionHudLayer2(colorNames[i], format);
 				}
-				results += GameOptionHudLayer1("Moves", TotalTurns.ToString());
+				results += GameOptionHudLayer1("Total Moves", TotalTurns.ToString());
 				results = "<line-height=2>" + results + "</line-height>";
 				results = "<size=2>" + results + "</size>";
 				__instance.TaskText.text = results;
@@ -459,11 +450,10 @@ namespace AmongChess.Patches
 					target.GetComponent<SpriteRenderer>().GetMaterial().SetFloat("_Outline", 0);
 					int pieceIndex = Array.IndexOf(PieceTranslation, char.ToLower(target.name[0]));
 					oldPlayer.gameObject.active = true;
-					Timers[PlayerTurn] += 0.25f + float.Parse(ChessControl.IncrementTime);
 					IncrementTurn();
 					if (move == 'C' || move == 'S')
 					{
-						EventEnded(move);
+						EventEnded(move, true);
 						return false;
 					}
 				}
@@ -491,7 +481,15 @@ namespace AmongChess.Patches
 				}
 				else if (PlayerActivity == 'E')
 				{
-					ShipStatus.RpcEndGame(GameOverReason.ImpostorByVote, false);
+					if (PlayerControl.LocalPlayer.AmOwner)
+					{
+						ShipStatus.RpcEndGame(GameOverReason.ImpostorByVote, false);
+					}
+					else
+					{
+						MessageWriter rpcMessage = AmongUsClient.Instance.StartRpc(PlayerControl.LocalPlayer.NetId, 69, (SendOption)1);
+						rpcMessage.EndMessage();
+					}
 				}
 				else if (PlayerActivity == 'W')
 				{
@@ -604,11 +602,14 @@ namespace AmongChess.Patches
 			}
 		}
 
-		public static void EventEnded(char results)
+		public static void EventEnded(char results, bool rpcSend)
 		{
-			MessageWriter rpcMessageLocal = AmongUsClient.Instance.StartRpc(PlayerControl.LocalPlayer.NetId, 67, (SendOption)1);
-			rpcMessageLocal.Write((byte)(results == 'S' ? 0 : 1));
-			rpcMessageLocal.EndMessage();
+			if (rpcSend == true)
+			{
+				MessageWriter rpcMessageLocal = AmongUsClient.Instance.StartRpc(PlayerControl.LocalPlayer.NetId, 67, (SendOption)1);
+				rpcMessageLocal.Write((byte)(results == 'S' ? 0 : 1));
+				rpcMessageLocal.EndMessage();
+			}
 			PlayerActivity = 'E';
 			if (PlayerTurn == 0) PlayerTurn = (byte)AllPlayers.Count;
 			PlayerTurn--;
@@ -663,7 +664,7 @@ namespace AmongChess.Patches
 			if (0 >= Timers[PlayerTurn])
 			{
 				Timers[PlayerTurn] = 0f;
-				EventEnded('T');
+				EventEnded('T', true);
 			}
 		}
 	}

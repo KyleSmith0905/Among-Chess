@@ -21,6 +21,7 @@ namespace AmongChess.Patches
 						fromCoordinates.y = reader.ReadByte();
 						toCoordinates.x = reader.ReadByte();
 						toCoordinates.y = reader.ReadByte();
+						GameEvents.Timers[GameEvents.PlayerTurn] += 0.25f + float.Parse(ChessControl.IncrementTime);
 						GameEvents.PlayMove(fromCoordinates, toCoordinates);
 						char[,] chessBoard = ChessControl.PlayMove(fromCoordinates, toCoordinates);
 						GameEvents.IncrementTurn();
@@ -52,7 +53,7 @@ namespace AmongChess.Patches
 					case 67: // Game Ends
 					{
 						byte winEvent = reader.ReadByte();
-						GameEvents.EventEnded(winEvent == 0 ? 'S' : 'C');
+						GameEvents.EventEnded(winEvent == 0 ? 'S' : 'C', false);
 						break;
 					}
 					case 68: // Custom Options Retrieve
@@ -67,6 +68,14 @@ namespace AmongChess.Patches
 							byte optionId = reader.ReadByte();
 							OptionSingle optionSingle = OptionControl.AllOption.Find(option => option.Id == optionId);
 							optionSingle.Value = reader.ReadByte();
+						}
+						break;
+					}
+					case 69: // Tell owner the game ended
+					{
+						if (PlayerControl.LocalPlayer.AmOwner)
+						{
+							ShipStatus.RpcEndGame(GameOverReason.ImpostorByVote, false);
 						}
 						break;
 					}

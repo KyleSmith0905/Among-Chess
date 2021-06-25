@@ -32,18 +32,18 @@
 The folder should look like this after step 3 (assuming you are modding the Steam version).
 ```
 .
-┣ Among Us_Data
-┣ BepInEx
-┣ mono
-┣ Among Us
-┣ baselib.dll
-┣ doorstop_config
-┣ GameAssembly.dll
-┣ msvcp140.dll
-┣ UnityCrashHandler32
-┣ UnityPlayer.dll
-┣ vcruntime140.dll
-┗ winhttp.dll
+┣━ Among Us_Data
+┣━ BepInEx*
+┣━ mono*
+┣━ Among Us
+┣━ baselib.dll
+┣━ doorstop_config*
+┣━ GameAssembly.dll
+┣━ msvcp140.dll
+┣━ UnityCrashHandler32
+┣━ UnityPlayer.dll
+┣━ vcruntime140.dll
+┗━ winhttp.dll*
 ```
 
 ---

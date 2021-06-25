@@ -183,7 +183,7 @@ namespace AmongChess.Patches
 					break;
 			}
 			if (fromObject.name[0] != 't' || !canMove) return 'e';
-			_ = PieceAging(ref tempChessBoard);
+			PieceAging(ref tempChessBoard);
 			PlayMove(ref tempChessBoard, fromCoordinates, toCoordinates, howMove);
 			(int x, int y) ourKingCoordinates = KingFinder(char.IsUpper(fromPiece), tempChessBoard);
 			(int x, int y) theirKingCoordinates = KingFinder(!char.IsUpper(fromPiece), tempChessBoard);
@@ -212,7 +212,8 @@ namespace AmongChess.Patches
 				GameEvents.PlayMove(fromObject, toCoordinates, howMove);
 			}
 			ChessBoard = tempChessBoard;
-			return IsInCheckmate(theirKingCoordinates, tempChessBoard) == 'n' ? 'C' : (theirKingChecks.Count == 0 && IsInStalemate(theirKingCoordinates, tempChessBoard) ? 'S' : 'n');
+			Debug.logger.Log(IsInCheckmate(theirKingCoordinates, tempChessBoard).ToString());
+			return IsInCheckmate(theirKingCoordinates, tempChessBoard) == 'n' ? (theirKingChecks.Count == 0 && IsInStalemate(theirKingCoordinates, tempChessBoard) ? 'S' : 'n') : 'C';
 		}
 
 		public static bool KingMovement((int x, int y) fromCoordinates, (int x, int y) toCoordinates, out char howMove)
@@ -401,7 +402,7 @@ namespace AmongChess.Patches
 		public static char IsInCheckmate((int x, int y) kingCoordinates, char[,] chessBoard)
 		{
 			List<(int x, int y)> checks = NumCheck(kingCoordinates, chessBoard);
-			if (checks.Count == 0) return 'z';
+			if (checks.Count == 0) return 'n';
 			for (int i = 0; i < 8; i++)
 			{
 				(int x, int y) escapeCoordinates = (Mathf.RoundToInt((float)Math.Cos(i * Math.PI * 0.25)) + kingCoordinates.x, Mathf.RoundToInt((float)Math.Sin(i * Math.PI * 0.25)) + kingCoordinates.y);
@@ -619,7 +620,7 @@ namespace AmongChess.Patches
 			return howMove;
 		}
 
-		public static char[,] PieceAging(ref char[,] chessBoard)
+		public static void PieceAging(ref char[,] chessBoard)
 		{
 			for (int y = 0; y < chessBoard.GetLength(0); y++)
 			{
@@ -628,7 +629,6 @@ namespace AmongChess.Patches
 					if (char.ToUpper(chessBoard[y, x]) == 'E') chessBoard.SetValue(char.IsUpper(chessBoard[y, x]) ? 'P' : 'p', new int[] { y, x });
 				}
 			}
-			return chessBoard;
 		}
 	}
 }

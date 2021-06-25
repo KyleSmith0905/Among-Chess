@@ -1,4 +1,15 @@
-﻿using BepInEx;
+﻿/*
+ * [ ] Increment time out of sync
+ * [ ] Every ~10 turns send RPC to resync time just in case.
+ * [ ] Fix randomize who is white
+ * [ ] Create Among Us hats for characters
+ * [ ] Chess bot
+ * [ ] Add maps
+ * [ ] Check if square vents exist on Polus
+ * [ ] Scholars mate does not result in checkmate
+ */
+
+using BepInEx;
 using BepInEx.IL2CPP;
 using HarmonyLib;
 using Reactor;
