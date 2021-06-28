@@ -2,6 +2,7 @@
 using Hazel;
 using System;
 using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
 
 namespace AmongChess.Patches
@@ -115,13 +116,18 @@ namespace AmongChess.Patches
 		public static class EndGameManagerPatch
 		{
 			[HarmonyPatch(nameof(EndGameManager.Start))]
-			[HarmonyPostfix]
+			[HarmonyPrefix]
 			public static void StartPatch(EndGameManager __instance)
 			{
 				string[] colorNames = (string[])ColorNames.GetValue(GameData.Instance.PlayerCount - 1);
 				int[] colorIds = (int[])ColorIds.GetValue(GameData.Instance.PlayerCount - 1);
-				__instance.WinText.text = colorNames[PlayerTurn] + " won";
-				__instance.WinText.color = Palette.PlayerColors[colorIds[PlayerTurn]];
+				TextMeshPro winText = UnityEngine.Object.Instantiate(__instance.WinText);
+				__instance.WinText.enabled = false;
+				winText.text = colorNames[PlayerTurn] + " won";
+				winText.color = Palette.PlayerColors[colorIds[PlayerTurn]];
+				TempData.winners.Clear();
+				TempData.winners.Add(new WinningPlayerData(AllPlayers[PlayerTurn].Data));
+				AllPlayers.Clear();
 			}
 		}
 
@@ -435,6 +441,12 @@ namespace AmongChess.Patches
 					localPlayer.SetHat(LocalHat, localPlayer.Data.ColorId);
 					localPlayer.SetSkin(LocalSkin);
 					localPlayer.SetPet(LocalPet);
+					if (TotalTurns % 10 == 0 && TotalTurns > 0)
+					{
+						MessageWriter rpcMessageTime = AmongUsClient.Instance.StartRpc(PlayerControl.LocalPlayer.NetId, 70, (SendOption)1);
+						rpcMessageTime.Write(Timers[PlayerTurn]);
+						rpcMessageTime.EndMessage();
+					}
 					MessageWriter rpcMessageMove = AmongUsClient.Instance.StartRpc(PlayerControl.LocalPlayer.NetId, 64, (SendOption)1);
 					rpcMessageMove.Write((byte)pieceCoordinates.x);
 					rpcMessageMove.Write((byte)pieceCoordinates.y);
@@ -450,6 +462,7 @@ namespace AmongChess.Patches
 					target.GetComponent<SpriteRenderer>().GetMaterial().SetFloat("_Outline", 0);
 					int pieceIndex = Array.IndexOf(PieceTranslation, char.ToLower(target.name[0]));
 					oldPlayer.gameObject.active = true;
+					Timers[PlayerTurn] += 0.25f + float.Parse(ChessControl.IncrementTime);
 					IncrementTurn();
 					if (move == 'C' || move == 'S')
 					{
@@ -481,7 +494,7 @@ namespace AmongChess.Patches
 				}
 				else if (PlayerActivity == 'E')
 				{
-					if (PlayerControl.LocalPlayer.AmOwner)
+					if (AmongUsClient.Instance.AmHost)
 					{
 						ShipStatus.RpcEndGame(GameOverReason.ImpostorByVote, false);
 					}
@@ -495,7 +508,6 @@ namespace AmongChess.Patches
 				{
 					return false;
 				}
-
 				return false;
 			}
 		}
@@ -561,10 +573,7 @@ namespace AmongChess.Patches
 			char howMove = 'N';
 			int directionY = char.IsUpper(ChessControl.ChessBoard[fromCoordinates.y, fromCoordinates.x]) ? -1 : 1;
 			float halfRank = ChessControl.ChessBoard.GetLength(0) * 0.5f;
-			if (ChessControl.ReadablePiece(ChessControl.ChessBoard[fromCoordinates.y, fromCoordinates.x]) == 'P' && toCoordinates.y == halfRank + (halfRank * directionY))
-			{
-				howMove = 'P';
-			}
+			if (ChessControl.ReadablePiece(ChessControl.ChessBoard[fromCoordinates.y, fromCoordinates.x]) == 'P' && toCoordinates.y == halfRank + (halfRank * directionY)) howMove = 'P';
 			Transform piecesObject = GameObject.Find("PiecesPath").transform;
 			for (int i = 0; i < piecesObject.childCount; i++)
 			{

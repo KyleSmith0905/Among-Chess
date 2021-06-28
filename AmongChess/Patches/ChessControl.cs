@@ -187,8 +187,8 @@ namespace AmongChess.Patches
 			PlayMove(ref tempChessBoard, fromCoordinates, toCoordinates, howMove);
 			(int x, int y) ourKingCoordinates = KingFinder(char.IsUpper(fromPiece), tempChessBoard);
 			(int x, int y) theirKingCoordinates = KingFinder(!char.IsUpper(fromPiece), tempChessBoard);
-			List<(int x, int y)> theirKingChecks = NumCheck(theirKingCoordinates, tempChessBoard);
 			List<(int x, int y)> ourKingChecks = NumCheck(ourKingCoordinates, tempChessBoard);
+			List<(int x, int y)> theirKingChecks = NumCheck(theirKingCoordinates, tempChessBoard);
 			if (ourKingChecks.Count > 0) return 'e';
 			if (toPiece != '1' || howMove == 'E')
 			{
@@ -212,8 +212,9 @@ namespace AmongChess.Patches
 				GameEvents.PlayMove(fromObject, toCoordinates, howMove);
 			}
 			ChessBoard = tempChessBoard;
-			Debug.logger.Log(IsInCheckmate(theirKingCoordinates, tempChessBoard).ToString());
-			return IsInCheckmate(theirKingCoordinates, tempChessBoard) == 'n' ? (theirKingChecks.Count == 0 && IsInStalemate(theirKingCoordinates, tempChessBoard) ? 'S' : 'n') : 'C';
+			if (IsInCheckmate(theirKingCoordinates, tempChessBoard) == 'n') return 'C';
+			else if (theirKingChecks.Count == 0 && IsInStalemate(theirKingCoordinates, tempChessBoard)) return 'S';
+			return 'n';
 		}
 
 		public static bool KingMovement((int x, int y) fromCoordinates, (int x, int y) toCoordinates, out char howMove)
@@ -402,11 +403,11 @@ namespace AmongChess.Patches
 		public static char IsInCheckmate((int x, int y) kingCoordinates, char[,] chessBoard)
 		{
 			List<(int x, int y)> checks = NumCheck(kingCoordinates, chessBoard);
-			if (checks.Count == 0) return 'n';
+			if (checks.Count == 0) return 'z';
 			for (int i = 0; i < 8; i++)
 			{
 				(int x, int y) escapeCoordinates = (Mathf.RoundToInt((float)Math.Cos(i * Math.PI * 0.25)) + kingCoordinates.x, Mathf.RoundToInt((float)Math.Sin(i * Math.PI * 0.25)) + kingCoordinates.y);
-				if (CheckBounds(escapeCoordinates) || chessBoard[escapeCoordinates.y, escapeCoordinates.x] != '1') continue;
+				if (CheckBounds(escapeCoordinates) || char.IsUpper(chessBoard[escapeCoordinates.y, escapeCoordinates.x]) == char.IsUpper(chessBoard[kingCoordinates.y, kingCoordinates.x])) continue;
 				List<(int x, int y)> numChecks = NumCheck(escapeCoordinates, chessBoard, char.IsUpper(chessBoard[kingCoordinates.y, kingCoordinates.x]));
 				if (numChecks.Count == 0) return 'e';
 			}
@@ -415,7 +416,8 @@ namespace AmongChess.Patches
 			for (int index = 0; index < captures.Count; index++)
 			{
 				char piece = chessBoard[captures[0].y, captures[0].x];
-				if (piece == 'N') return 'c';
+				if (char.ToUpper(piece) == 'N') return 'c';
+				else if (char.ToUpper(ReadablePiece(piece)) == 'K') continue;
 				(int x, int y) kingDirection = (Math.Sign(captures[index].x - kingCoordinates.x), Math.Sign(captures[index].y - kingCoordinates.y));
 				for (int i = 0; i < 6; i++)
 				{
@@ -429,16 +431,17 @@ namespace AmongChess.Patches
 				}
 			}
 			char attackPiece = chessBoard[checks[0].y, checks[0].x];
-			if (attackPiece == 'P' || attackPiece == 'N' || attackPiece == 'K') return 'n';
+			char confirmPiece = char.ToUpper(ReadablePiece(attackPiece));
+			if (confirmPiece == 'P' || confirmPiece == 'N' || confirmPiece == 'K') return 'n';
 			(int x, int y) direction = (Math.Sign(checks[0].x - kingCoordinates.x), Math.Sign(checks[0].y - kingCoordinates.y));
 			for (int index = 0; index < 6; index++)
 			{
 				(int x, int y) testCoordinates = ((direction.x * index) + kingCoordinates.x, (direction.y * index) + kingCoordinates.y);
-				if (CheckBounds(testCoordinates)) return 'n';
+				if (CheckBounds(testCoordinates) || chessBoard[testCoordinates.y, testCoordinates.x] != '1') return 'n';
 				List<(int x, int y)> blocks = NumCheck(testCoordinates, chessBoard, !char.IsUpper(chessBoard[kingCoordinates.y, kingCoordinates.x]));
 				for (int ind = 0; ind < blocks.Count; ind++)
 				{
-					if (char.ToUpper(chessBoard[blocks[ind].y, blocks[ind].x]) == 'K' || char.ToUpper(chessBoard[blocks[ind].y, blocks[ind].x]) == 'M') continue;
+					if (char.ToUpper(ReadablePiece(chessBoard[blocks[ind].y, blocks[ind].x])) == 'K') continue;
 					(int x, int y) defendDirection = (Math.Sign(blocks[ind].x - kingCoordinates.x), Math.Sign(blocks[ind].y - kingCoordinates.y));
 					for (int i = 0; i < 6; i++)
 					{

@@ -1,15 +1,4 @@
-﻿/*
- * [ ] Increment time out of sync
- * [ ] Every ~10 turns send RPC to resync time just in case.
- * [ ] Fix randomize who is white
- * [ ] Create Among Us hats for characters
- * [ ] Chess bot
- * [ ] Add maps
- * [ ] Check if square vents exist on Polus
- * [ ] Scholars mate does not result in checkmate
- */
-
-using BepInEx;
+﻿using BepInEx;
 using BepInEx.IL2CPP;
 using HarmonyLib;
 using Reactor;
@@ -24,7 +13,8 @@ namespace AmongChess
 	[ReactorPluginSide(PluginSide.ClientOnly)]
 	public class AmongChess : BasePlugin
 	{
-		public const string version = "1.0.0";
+		public const string version = "v1.0.2";
+		public const bool dev = false;
 
 		public Harmony Harmony { get; } = new Harmony("kylesmith0905.amongchess");
 
@@ -34,7 +24,7 @@ namespace AmongChess
 			{
 				text.faceColor = new Color32(255, 165, 0, 255);
 				text.fontSize = 3.2f;
-				text.text = "Among Chess v" + version;
+				text.text = "Among Chess " + version;
 			};
 			Harmony.PatchAll();
 		}

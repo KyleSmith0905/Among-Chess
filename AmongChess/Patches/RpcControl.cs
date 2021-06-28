@@ -73,10 +73,16 @@ namespace AmongChess.Patches
 					}
 					case 69: // Tell owner the game ended
 					{
-						if (PlayerControl.LocalPlayer.AmOwner)
+						if (AmongUsClient.Instance.AmHost)
 						{
 							ShipStatus.RpcEndGame(GameOverReason.ImpostorByVote, false);
 						}
+						break;
+					}
+					case 70: // Synchronize time
+					{
+						float time = reader.ReadSingle();
+						GameEvents.Timers[GameEvents.PlayerTurn] = time;
 						break;
 					}
 				}

@@ -20,7 +20,7 @@ namespace AmongChess.Patches
 			{
 				Id = 0,
 				Name = "Game Mode",
-				AllValues = new string[] { "Chess" /*, Dev-Chess*/ }
+				AllValues = new string[] { "Chess" }//, "Dev-Chess"}
 			};
 			OptionSingle variant = new OptionSingle()
 			{
@@ -49,6 +49,7 @@ namespace AmongChess.Patches
 				GroupId = 0,
 				Exemption = (3, new byte[] { 0 })
 			};
+			//if (AmongChess.dev) gameMode.AllValues.add  // Change to List<> first
 			return new List<OptionSingle> { gameMode, variant, board, mainTime, incrementalTime }; ;
 		}
 
@@ -129,10 +130,11 @@ namespace AmongChess.Patches
 			{
 				GameObject parentObject = GameObject.Find("SliderInner");
 				StringOption stringOption = UnityEngine.Object.FindObjectOfType<StringOption>();
+				parentObject.transform.position = new Vector3(parentObject.transform.position.x, 2.4f, parentObject.transform.position.z);
 				for (int i = 0; i < AllOption.Count; i++)
 				{
 					StringOption option = UnityEngine.Object.Instantiate(stringOption, parentObject.transform);
-					option.transform.position = new Vector3(option.transform.position.x, 3.55f - (i * 0.5f), option.transform.position.z);
+					option.transform.position = new Vector3(option.transform.position.x, 3.35f - (i * 0.5f), option.transform.position.z);
 					option.name = "Custom" + AllOption[i].Id;
 					option.Values = new StringNames[] { 0 };
 				}
@@ -167,7 +169,8 @@ namespace AmongChess.Patches
 					}
 				}
 				Scroller menuScroller = parentObject.transform.parent.GetComponent<Scroller>();
-				if (menuScroller.enabled) menuScroller.enabled = false;
+				menuScroller.YBounds.min = 0;
+				menuScroller.YBounds.max = 0;
 				return false;
 			}
 		}
