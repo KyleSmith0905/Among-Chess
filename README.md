@@ -1,3 +1,5 @@
+Join our **community Discord**: https://discord.gg/SSDVCHPbrg
+
 ![Among Chess Logo](https://github.com/KyleSmith0905/Among-Chess/blob/master/Images/Logo-3D-Faded.png "Among Chess")
 
 ---
