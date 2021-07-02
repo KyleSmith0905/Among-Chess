@@ -3,17 +3,17 @@ using Hazel;
 
 namespace AmongChess.Patches
 {
-	class RpcControl
+	internal class RpcControl
 	{
 		[HarmonyPatch(typeof(PlayerControl), nameof(PlayerControl.HandleRpc))]
 		public static class HandleRpcPatch
 		{
 			public static void Postfix(byte callId, MessageReader reader)
 			{
-				UnityEngine.Debug.logger.Log($"Call ID: {callId}");
-				switch (callId)
+				UnityEngine.Debug.logger.Log("CallId: " + callId.ToString());
+				switch ((EnumRpc)callId)
 				{
-					case 64: // Move Piece
+					case EnumRpc.MovePiece:
 					{
 						(byte x, byte y) fromCoordinates = (0, 0);
 						(byte x, byte y) toCoordinates = (0, 0);
@@ -21,57 +21,52 @@ namespace AmongChess.Patches
 						fromCoordinates.y = reader.ReadByte();
 						toCoordinates.x = reader.ReadByte();
 						toCoordinates.y = reader.ReadByte();
-						GameEvents.Timers[GameEvents.PlayerTurn] += 0.25f + float.Parse(ChessControl.IncrementTime);
-						GameEvents.PlayMove(fromCoordinates, toCoordinates);
-						char[,] chessBoard = ChessControl.PlayMove(fromCoordinates, toCoordinates);
-						GameEvents.IncrementTurn();
-						ChessControl.ChessBoard = chessBoard;
+						GameControl.Utilities.AddIncrementTime(GameControl.Control.PlayerTurn);
+						GameControl.Control.GetAndPlayMove(fromCoordinates, toCoordinates);
+						char[,] chessBoard = ChessControl.Control.PlayMove(fromCoordinates, toCoordinates);
+						GameControl.Utilities.IncrementTurn();
+						ChessControl.Control.ChessBoard = chessBoard;
 						break;
 					}
-					case 65: // Select Piece
+					case EnumRpc.SelectPiece:
 					{
 						byte playerId = reader.ReadByte();
 						byte selectedPiece = reader.ReadByte();
-						PlayerControl playerControl = GameEvents.FindPlayer(playerId);
-						playerControl.SetHat(GameEvents.HatTranslation[selectedPiece], playerControl.Data.ColorId);
-						playerControl.SetSkin(GameEvents.SkinTranslation[selectedPiece]);
+						PlayerControl playerControl = GameControl.Utilities.FindPlayer(playerId);
+						playerControl.SetHat(GameControl.Utilities.PieceHats[selectedPiece], playerControl.Data.ColorId);
+						playerControl.SetSkin(GameControl.Utilities.PieceSkins[selectedPiece]);
 						playerControl.SetPet(0u);
 						break;
 					}
-					case 66: // Return Piece
+					case EnumRpc.ReturnPiece:
 					{
 						byte playerId = reader.ReadByte();
-						byte hatId = reader.ReadByte(); // Works for now, change to uint if there are more than 255 hats.
-						byte skinId = reader.ReadByte();
-						byte petId = reader.ReadByte();
-						PlayerControl playerControl = GameEvents.FindPlayer(playerId);
-						playerControl.SetHat(hatId, playerControl.Data.ColorId);
-						playerControl.SetSkin(skinId);
-						playerControl.SetPet(petId);
+						GameControl.Utilities.RevertClothingById(playerId);
 						break;
 					}
-					case 67: // Game Ends
+					case EnumRpc.GameResult:
 					{
 						byte winEvent = reader.ReadByte();
-						GameEvents.EventEnded(winEvent == 0 ? 'S' : 'C', false);
+						byte winnerId = reader.ReadByte();
+						GameControl.Control.EventEnded((ChessControl.EnumResults)winEvent, winnerId, false);
 						break;
 					}
-					case 68: // Custom Options Retrieve
+					case EnumRpc.CustomOptions:
 					{
-						if (OptionControl.AllOption.Count == 0)
+						if (LobbyControl.OptionControl.AllOption.Count == 0)
 						{
-							OptionControl.AllOption = OptionControl.OptionDefault();
-							OptionControl.AllOptionGroup = OptionControl.OptionGroupDefault();
+							LobbyControl.OptionControl.AllOption = LobbyControl.OptionControl.OptionDefault();
+							LobbyControl.OptionControl.AllOptionGroup = LobbyControl.OptionControl.OptionGroupDefault();
 						}
 						while (reader.BytesRemaining > 0)
 						{
 							byte optionId = reader.ReadByte();
-							OptionSingle optionSingle = OptionControl.AllOption.Find(option => option.Id == optionId);
+							OptionSingle optionSingle = LobbyControl.OptionControl.AllOption.Find(option => option.Id == optionId);
 							optionSingle.Value = reader.ReadByte();
 						}
 						break;
 					}
-					case 69: // Tell owner the game ended
+					case EnumRpc.GameEnd:
 					{
 						if (AmongUsClient.Instance.AmHost)
 						{
@@ -79,10 +74,33 @@ namespace AmongChess.Patches
 						}
 						break;
 					}
-					case 70: // Synchronize time
+					case EnumRpc.SynchronizeTime:
 					{
 						float time = reader.ReadSingle();
-						GameEvents.Timers[GameEvents.PlayerTurn] = time;
+						GameControl.Control.AllCustomPlayers[GameControl.Control.PlayerTurn].Timer = time;
+						break;
+					}
+					case EnumRpc.PlayerLoaded:
+					{
+						if (AmongUsClient.Instance.AmHost)
+						{
+							byte playerId = reader.ReadByte();
+							GameControl.Utilities.FindCustom(playerId).Loaded = true;
+							GameControl.Utilities.FindCustom(PlayerControl.LocalPlayer.PlayerId).Loaded = true;
+							if (GameControl.Control.AllCustomPlayers.TrueForAll(ele => ele.Loaded == true))
+							{
+								int[] colorIds = (int[])GameControl.Control.ColorIds.GetValue(GameControl.Control.AllPlayers.Count - 1);
+								GameControl.Control.LocalActivity = PlayerControl.LocalPlayer.Data.ColorId == colorIds[0] ? GameControl.EnumActivity.GameSelect : GameControl.EnumActivity.Lobby;
+								MessageWriter rpcMessageTime = AmongUsClient.Instance.StartRpc(PlayerControl.LocalPlayer.NetId, 72, (SendOption)1);
+								rpcMessageTime.EndMessage();
+							}
+						}
+						break;
+					}
+					case EnumRpc.GameStart:
+					{
+						int[] colorIds = (int[])GameControl.Control.ColorIds.GetValue(GameControl.Control.AllPlayers.Count - 1);
+						GameControl.Control.LocalActivity = PlayerControl.LocalPlayer.Data.ColorId == colorIds[0] ? GameControl.EnumActivity.GameSelect : GameControl.EnumActivity.Lobby;
 						break;
 					}
 				}

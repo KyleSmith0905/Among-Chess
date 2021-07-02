@@ -13,7 +13,7 @@ namespace AmongChess
 	[ReactorPluginSide(PluginSide.ClientOnly)]
 	public class AmongChess : BasePlugin
 	{
-		public const string version = "v1.0.2";
+		public const string version = "v1.0.3";
 		public const bool dev = false;
 
 		public Harmony Harmony { get; } = new Harmony("kylesmith0905.amongchess");

@@ -15,13 +15,15 @@
 
 ---
 # Disclaimer
-<p align="center"> This mod is not affiliated with Among Us or Innersloth LLC, and the content contained therein is not endorsed or otherwise sponsored by Innersloth LLC. Portions of the materials contained herein are property of Innersloth LLC. © Innersloth LLC.</p>
+<p align="center">This mod is not affiliated with Among Us or Innersloth LLC, and the content contained therein is not endorsed or otherwise sponsored by Innersloth LLC. Portions of the materials contained herein are property of Innersloth LLC.</p>
+
+<p align="center">© Innersloth LLC.</p>
 
 ---
 # Installation
 | Mod Version| Among Us Version| Download|
 |:---|:---|:---:|
-| 1.0.2| 2021.6.15| [Link](https://github.com/KyleSmith0905/Among-Chess/releases/tag/v1.0.2 "1.0.2")|
+| 1.0.3| 2021.6.15| [Link](https://github.com/KyleSmith0905/Among-Chess/releases/tag/v1.0.3 "1.0.3")|
 
 1. Download the mod using the download link above, then extract the Among Chess folder.
 2. Go to the location of your Among Us folder and copy the folder to an easily accessible location (such as the documents folder).
@@ -101,5 +103,5 @@ Please contact the current creator by messaging him on Discord (FiNS Flexin#6193
     └─── 30
 ```
 
-[Note 1]: Time control can get slightly desynchronized. The mod will attempt to adjust for it the best it can.
+[Note 1]: Time control can get slightly desynchronized. The mod will attempt to adjust for it the best it can.\
 [Note 2]: The duration it takes to walk between pieces is already considered. Change these settings like you would on a standard chess website.
