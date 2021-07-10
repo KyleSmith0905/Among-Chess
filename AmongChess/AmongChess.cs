@@ -13,10 +13,9 @@ namespace AmongChess
 	[ReactorPluginSide(PluginSide.ClientOnly)]
 	public class AmongChess : BasePlugin
 	{
-		public const string version = "v1.0.3";
-		public const bool dev = false;
+		public const string version = "v1.1.0";
 
-		public Harmony Harmony { get; } = new Harmony("kylesmith0905.amongchess");
+		public Harmony Harmony = new Harmony("kylesmith0905.amongchess");
 
 		public override void Load()
 		{
@@ -28,7 +27,6 @@ namespace AmongChess
 			};
 			Harmony.PatchAll();
 		}
-
 		[HarmonyPatch(typeof(CreateGameOptions), nameof(CreateGameOptions.Show))]
 		public static class CreateGameOptionsShowPatch
 		{

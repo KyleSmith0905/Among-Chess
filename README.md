@@ -1,19 +1,32 @@
+[![Discord](https://img.shields.io/discord/858193450506911804.svg?label=&logo=discord&logoColor=ffffff&color=7389D8&labelColor=6A7EC2)](https://discord.gg/bbuTGdaSyr)
+[![Github Downloads](https://img.shields.io/github/downloads/KyleSmith0905/Among-Chess/total.svg)](https://github.com/KyleSmith0905/Among-Chess/releases)
+[![GitHub release](https://img.shields.io/github/release/KyleSmith0905/Among-Chess.svg)](https://GitHub.com/KyleSmith0905/Among-Chess/releases/)
+
+
 Join our **community Discord**: https://discord.gg/SSDVCHPbrg
 
 ![Among Chess Logo](https://github.com/KyleSmith0905/Among-Chess/blob/master/Images/Logo-3D-Faded.png "Among Chess")
 
 ---
 # Table of Contents
-1. [Disclaimer](https://github.com/KyleSmith0905/Among-Chess/README.md#Disclaimer "Disclaimer Section")
-2. [Installation](https://github.com/KyleSmith0905/Among-Chess/README.md#Installation "Installation Section")
-3. [Feedback](https://github.com/KyleSmith0905/Among-Chess/README.md#Feedback "Feedback Section")
-4. [Credit](https://github.com/KyleSmith0905/Among-Chess/README.md#Credit "Credit Section")
-5. [Settings](https://github.com/KyleSmith0905/Among-Chess/README.md#Settings "Settings Section")
+1. [About](https://github.com/KyleSmith0905/Among-Chess/README.md#About "About Section")
+2. [Disclaimer](https://github.com/KyleSmith0905/Among-Chess/README.md#Disclaimer "Disclaimer Section")
+3. [Installation](https://github.com/KyleSmith0905/Among-Chess/README.md#Installation "Installation Section")
+4. [Feedback](https://github.com/KyleSmith0905/Among-Chess/README.md#Feedback "Feedback Section")
+5. [Credit](https://github.com/KyleSmith0905/Among-Chess/README.md#Credit "Credit Section")
+6. [Settings](https://github.com/KyleSmith0905/Among-Chess/README.md#Settings "Settings Section")
     1. [Game Modes](https://github.com/KyleSmith0905/Among-Chess/README.md#Game-Modes "Game Modes Subsection")
     2. [Variation](https://github.com/KyleSmith0905/Among-Chess/README.md#Variation "Variation Subsection")
     3. [Board](https://github.com/KyleSmith0905/Among-Chess/README.md#Board "Variation Subsection")
     4. [Main Time](https://github.com/KyleSmith0905/Among-Chess/README.md#Main-Time "Main Time Subsection")
     5. [Increment Time](https://github.com/KyleSmith0905/Among-Chess/README.md#Increment-Time "Increment Time Subsection")
+
+---
+# About
+Among Chess is an Among Us mod for playing chess. In the in-game settings there are various variants, boards, and time controls you may play with. All traditional rules of chess applies to Among Chess.\
+For a fun 1 minute trailer, click [this link](https://www.youtube.com/watch?v=44SC-SNaBDg).
+
+![Among Chess Gameplay](https://github.com/KyleSmith0905/Among-Chess/blob/master/Images/Gameplay-Board.png "Among Chess Gameplay")
 
 ---
 # Disclaimer
@@ -23,9 +36,18 @@ Join our **community Discord**: https://discord.gg/SSDVCHPbrg
 
 ---
 # Installation
+
+The mod can be downloaded two different ways. By directly downloading the mod which is easiest but doesn't automatically update, or by downloading mod manager which is harder but automatically updates the mod and adds a few other mods.
+
+### Direct Download
+
 | Mod Version| Among Us Version| Download|
 |:---|:---|:---:|
-| 1.0.3| 2021.6.15| [Link](https://github.com/KyleSmith0905/Among-Chess/releases/tag/v1.0.3 "1.0.3")|
+| *Latest*|   | [Link](https://github.com/KyleSmith0905/Among-Chess/releases/latest "Latest Version")||
+| 1.1.0| 2021.6.30| [Link](https://github.com/KyleSmith0905/Among-Chess/releases/tag/v1.0.4 "Version 1.1.0")|
+| 1.0.3| 2021.6.15| [Link](https://github.com/KyleSmith0905/Among-Chess/releases/tag/v1.0.3 "Version 1.0.3")|
+
+For a visual guide, view [this tutorial](https://www.youtube.com/watch?v=JCvxKicRfB4) made by *DaNOOB*.
 
 1. Download the mod using the download link above, then extract the Among Chess folder.
 2. Go to the location of your Among Us folder and copy the folder to an easily accessible location (such as the documents folder).
@@ -49,6 +71,10 @@ The folder should look like this after step 3 (assuming you are modding the Stea
 ┣━ vcruntime140.dll
 ┗━ winhttp.dll*
 ```
+
+### Mod Manager
+
+Follow the instructions on the [Mod Manager's website](https://mm.matux.fr "Mod Manager's Website").
 
 ---
 # Feedback
@@ -77,11 +103,13 @@ Please contact the current creator by messaging him on Discord (FiNS Flexin#6193
 ┃ └─── Chess
 ┃
 ┣━┯━ Variation
-┃ └─── Normal
+┃ ├─── Normal
+┃ └─── Real-Time ┄ (Both players may move at the same time)
 ┃
 ┣━┯━ Board
 ┃ ├─── Default
-┃ └─── Chess960 ┄ (Randomized positions of the major pieces)
+┃ ├─── Chess960 ┄ (Randomized positions of pieces, placement is mirrored)
+┃ └─── Transcendental Chess ┄ (Randomized positions of pieces, placement is not mirrored)
 ┃
 ┗━┳━ Time Control ┅ [Note 1]
   ┣━┯━ Main Time
