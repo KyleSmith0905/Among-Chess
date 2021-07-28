@@ -44,7 +44,7 @@ The mod can be downloaded two different ways. By directly downloading the mod wh
 | Mod Version| Among Us Version| Download|
 |:---|:---|:---:|
 | *Latest*|   | [Link](https://github.com/KyleSmith0905/Among-Chess/releases/latest "Latest Version")||
-| 1.1.0| 2021.6.30| [Link](https://github.com/KyleSmith0905/Among-Chess/releases/tag/v1.0.4 "Version 1.1.0")|
+| 1.1.1| 2021.6.30| [Link](https://github.com/KyleSmith0905/Among-Chess/releases/tag/v1.1.1 "Version 1.1.1")|
 | 1.0.3| 2021.6.15| [Link](https://github.com/KyleSmith0905/Among-Chess/releases/tag/v1.0.3 "Version 1.0.3")|
 
 For a visual guide, view [this tutorial](https://www.youtube.com/watch?v=JCvxKicRfB4) made by *DaNOOB*.
